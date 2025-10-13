@@ -5,84 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team WIG Progress Dashboard</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #2563eb;
-      --light: #dbeafe;
-      --bg: #f9fafb;
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --accent: #10b981;
+      --bg: #f0f4f8;
+      --card-bg: #ffffff;
       --text-dark: #111827;
       --text-muted: #6b7280;
-      --card-bg: #ffffff;
       --border: #e5e7eb;
+      --shadow-light: rgba(0, 0, 0, 0.05);
+      --shadow-dark: rgba(0, 0, 0, 0.12);
     }
 
     body {
-      font-family: "Inter", system-ui, sans-serif;
-      background-color: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text-dark);
       margin: 0;
     }
 
     header {
-      background-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       color: white;
       padding: 1.5rem;
       text-align: center;
-      font-size: 1.6rem;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 1.8rem;
+      font-weight: 700;
+      box-shadow: 0 6px 12px var(--shadow-dark);
+      letter-spacing: 0.5px;
     }
 
     .dashboard-container {
-      max-width: 960px;
+      max-width: 1000px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
 
     .team-card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 1.2rem;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
       overflow: hidden;
+      box-shadow: 0 8px 16px var(--shadow-light), 0 2px 4px var(--shadow-dark);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px var(--shadow-light), 0 4px 8px var(--shadow-dark);
     }
 
     .team-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f3f4f6;
-      padding: 1rem 1.2rem;
+      background: #f9fafc;
+      padding: 1.2rem 1.5rem;
       cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease;
+    }
+
+    .team-header:hover {
+      background: #f3f4f7;
     }
 
     .team-name {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 600;
     }
 
     .team-progress {
       font-size: 1rem;
       font-weight: 500;
-      color: var(--text-muted);
-      background: var(--light);
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
+      color: var(--accent);
+      background: #d1fae5;
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease;
     }
 
     .toggle-icon {
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, color 0.3s ease;
       color: var(--text-muted);
+      font-size: 1.2rem;
     }
 
     .team-card.open .toggle-icon {
       transform: rotate(90deg);
+      color: var(--primary);
     }
 
     .chart-area {
-      padding: 1rem 1.5rem 1.5rem;
+      padding: 1.5rem 2rem 2rem;
       display: none;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fafc 100%);
     }
 
     .team-card.open .chart-area {
@@ -91,48 +112,53 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
+      from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .legend {
       display: flex;
-      gap: 1.2rem;
+      gap: 1.5rem;
       font-size: 1rem;
-      margin-top: 0.6rem;
+      margin-top: 1rem;
       color: var(--text-muted);
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.5rem;
+      font-weight: 500;
     }
 
     .legend-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
 
     footer {
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin: 2rem 0 3rem;
+      margin: 3rem 0 4rem;
     }
 
     .tooltip {
       position: absolute;
       background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.5rem 0.8rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
       font-size: 0.95rem;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    svg rect {
+      rx: 6; /* rounded bars */
     }
   </style>
 </head>
@@ -145,7 +171,6 @@
 
   <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAlZLAJlBAF-_aPbJwDhrlAAjE2tg30nrJn3fUBfNYym9nmc3dFR5mgTSrr7GTxpd0PMNQXlPPqssB/pub?gid=2099304034&single=true&output=csv";
-
     const tooltip = d3.select("#tooltip");
 
     d3.csv(csvUrl).then(rawData => {
@@ -170,14 +195,13 @@
         const totalTarget = d3.sum(teamData, d => d.target);
         const totalActual = d3.sum(teamData, d => d.actual);
         const overall = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
-
         teamData.forEach((d, i) => d.shortLabel = `TWIG #${i + 1}`);
 
         const card = dashboard.append("div").attr("class", "team-card");
         const header = card.append("div").attr("class", "team-header")
           .on("click", () => card.classed("open", !card.classed("open")));
 
-        const leftHeader = header.append("div").style("display", "flex").style("gap", "0.6rem").style("align-items", "center");
+        const leftHeader = header.append("div").style("display", "flex").style("gap", "0.8rem").style("align-items", "center");
         leftHeader.append("div").attr("class", "team-name").text(teamName);
         leftHeader.append("div").attr("class", "team-progress").text(`${overall}%`);
         header.append("div").attr("class", "toggle-icon").html("▶");
@@ -189,7 +213,7 @@
         const legend = chartArea.append("div").attr("class", "legend");
         legend.html(`
           <div class="legend-item"><div class="legend-color" style="background:var(--primary)"></div> Actual Progress</div>
-          <div class="legend-item"><div class="legend-color" style="background:var(--light)"></div> Remaining to Target</div>
+          <div class="legend-item"><div class="legend-color" style="background:var(--primary-light)"></div> Remaining to Target</div>
         `);
       });
     }
@@ -207,7 +231,6 @@
       const x = d3.scaleLinear().domain([0, 100]).range([margin.left, width + margin.left]);
       const y = d3.scaleBand().domain(data.map(d => d.shortLabel)).range([margin.top, height]).padding(0.25);
 
-      // Target bars
       svg.selectAll(".target-bar")
         .data(data)
         .join("rect")
@@ -215,9 +238,8 @@
         .attr("y", d => y(d.shortLabel))
         .attr("width", x(100) - x(0))
         .attr("height", y.bandwidth())
-        .attr("fill", "var(--light)");
+        .attr("fill", "var(--primary-light)");
 
-      // Actual progress bars
       svg.selectAll(".actual-bar")
         .data(data)
         .join("rect")
@@ -233,27 +255,25 @@
         .ease(d3.easeCubicOut)
         .attr("width", d => x(d.progress) - x(0));
 
-      // Percent labels
       svg.selectAll(".bar-label")
         .data(data)
         .join("text")
-        .attr("x", d => x(d.progress) + 6)
+        .attr("x", d => x(d.progress) + 8)
         .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
         .attr("fill", "var(--text-dark)")
         .attr("font-size", "14px")
+        .attr("font-weight", "500")
         .text(d => `${Math.round(d.progress)}%`);
 
-      // Actual/Target numeric labels beside bars
-      svg.selectAll(".value-label")
-        .data(data)
-        .join("text")
-        .attr("x", x(100) + 50)
-        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
-        .attr("fill", "var(--text-muted)")
-        .attr("font-size", "13px")
-        .text(d => `${d.actual} / ${d.target}`);
+      // svg.selectAll(".value-label")
+      //   .data(data)
+      //   .join("text")
+      //   .attr("x", x(100) + 50)
+      //   .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
+      //   .attr("fill", "var(--text-muted)")
+      //   .attr("font-size", "13px")
+      //   .text(d => `${d.actual} / ${d.target}`);
 
-      // Y Axis
       const yAxis = svg.append("g")
         .attr("transform", `translate(${margin.left - 10},0)`)
         .call(d3.axisLeft(y).tickSize(0))
@@ -267,7 +287,6 @@
         })
         .on("mouseleave", hideTooltip);
 
-      // X Axis
       svg.append("g")
         .attr("transform", `translate(0,${margin.top})`)
         .call(d3.axisTop(x).ticks(5).tickFormat(d => d + "%"))
@@ -276,15 +295,16 @@
         .attr("font-size", "13px");
     }
 
-    // Tooltip helpers
     function showTooltip(event, html) {
       tooltip.html(html)
         .style("left", (event.pageX + 12) + "px")
         .style("top", (event.pageY - 28) + "px")
-        .style("opacity", 1);
+        .style("opacity", 1)
+        .style("transform", "translateY(-4px)");
     }
+
     function hideTooltip() {
-      tooltip.style("opacity", 0);
+      tooltip.style("opacity", 0).style("transform", "translateY(0)");
     }
   </script>
 </body>
