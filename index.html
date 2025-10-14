@@ -36,6 +36,14 @@
       font-weight: 700;
       box-shadow: 0 6px 12px var(--shadow-dark);
       letter-spacing: 0.5px;
+      position: relative;
+    }
+
+    #company-progress {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      color: #d1fae5;
     }
 
     .dashboard-container {
@@ -158,20 +166,25 @@
     }
 
     svg rect {
-      rx: 6; /* rounded bars */
+      rx: 6;
     }
   </style>
 </head>
 <body>
-  <header>San3a Tech TWIGs Progress</header>
+  <header>
+    San3a Tech TWIGs Progress
+    <div id="company-progress">Loading overall progress...</div>
+  </header>
+
   <div class="dashboard-container" id="dashboard"></div>
-  <footer>Data loaded directly from Team Progress Sheet </footer>
+  <footer>Data loaded directly from Team Progress Sheet</footer>
 
   <div class="tooltip" id="tooltip"></div>
 
   <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAlZLAJlBAF-_aPbJwDhrlAAjE2tg30nrJn3fUBfNYym9nmc3dFR5mgTSrr7GTxpd0PMNQXlPPqssB/pub?gid=2099304034&single=true&output=csv";
     const tooltip = d3.select("#tooltip");
+    const companyProgressDiv = d3.select("#company-progress");
 
     d3.csv(csvUrl).then(rawData => {
       const data = rawData
@@ -191,23 +204,34 @@
       const teams = d3.groups(data, d => d.team);
       const dashboard = d3.select("#dashboard");
 
+      const teamAverages = [];
+
       teams.forEach(([teamName, teamData]) => {
-        const totalTarget = d3.sum(teamData, d => d.target);
-        const totalActual = d3.sum(teamData, d => d.actual);
-        const overall = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+        const normalizedProgress = teamData.map(d => {
+          const pct = d.target > 0 ? (d.actual / d.target) * 100 : 0;
+          return Math.min(pct, 100);
+        });
+        const overall = Math.round(d3.mean(normalizedProgress));
+        teamAverages.push(overall);
+
         teamData.forEach((d, i) => d.shortLabel = `TWIG #${i + 1}`);
 
         const card = dashboard.append("div").attr("class", "team-card");
         const header = card.append("div").attr("class", "team-header")
           .on("click", () => card.classed("open", !card.classed("open")));
 
-        const leftHeader = header.append("div").style("display", "flex").style("gap", "0.8rem").style("align-items", "center");
+        const leftHeader = header.append("div")
+          .style("display", "flex")
+          .style("gap", "0.8rem")
+          .style("align-items", "center");
+
         leftHeader.append("div").attr("class", "team-name").text(teamName);
         leftHeader.append("div").attr("class", "team-progress").text(`${overall}%`);
         header.append("div").attr("class", "toggle-icon").html("▶");
 
         const chartArea = card.append("div").attr("class", "chart-area");
-        const svg = chartArea.append("svg").attr("viewBox", [0, 0, 850, teamData.length * 55 + 50]);
+        const svg = chartArea.append("svg")
+          .attr("viewBox", [0, 0, 850, teamData.length * 55 + 50]);
         drawTeamChart(svg, teamData);
 
         const legend = chartArea.append("div").attr("class", "legend");
@@ -216,6 +240,10 @@
           <div class="legend-item"><div class="legend-color" style="background:var(--primary-light)"></div> Remaining to Target</div>
         `);
       });
+
+      // Calculate and display company-wide average
+      const companyAverage = Math.round(d3.mean(teamAverages));
+      companyProgressDiv.text(`Company Overall Achievement: ${companyAverage}%`);
     }
 
     function drawTeamChart(svg, data) {
@@ -264,15 +292,6 @@
         .attr("font-size", "14px")
         .attr("font-weight", "500")
         .text(d => `${Math.round(d.progress)}%`);
-
-      // svg.selectAll(".value-label")
-      //   .data(data)
-      //   .join("text")
-      //   .attr("x", x(100) + 50)
-      //   .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
-      //   .attr("fill", "var(--text-muted)")
-      //   .attr("font-size", "13px")
-      //   .text(d => `${d.actual} / ${d.target}`);
 
       const yAxis = svg.append("g")
         .attr("transform", `translate(${margin.left - 10},0)`)
