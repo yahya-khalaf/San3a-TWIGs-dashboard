@@ -5,207 +5,295 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>San3a Tech TWIGs Progress</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-light: #818cf8;
-      --accent: #10b981;
-      --bg: #f0f4f8;
+      /* Modern, cooler palette */
+      --primary: #6366f1;      /* Indigo-500 */
+      --primary-dark: #4f46e5; /* Indigo-600 */
+      --primary-light: #a5b4fc; /* Indigo-300 */
+      --accent: #10b981;       /* Emerald-500 */
+      --accent-glow: rgba(16, 185, 129, 0.2);
+      --bg: #f8fafc;           /* Slate-50 */
       --card-bg: #ffffff;
-      --text-dark: #111827;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --shadow-light: rgba(0, 0, 0, 0.05);
-      --shadow-dark: rgba(0, 0, 0, 0.12);
+      --text-dark: #0f172a;    /* Slate-900 */
+      --text-muted: #64748b;   /* Slate-500 */
+      --border: #e2e8f0;       /* Slate-200 */
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text-dark);
       margin: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
     header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      background: linear-gradient(145deg, var(--primary-dark), var(--primary));
       color: white;
-      padding: 1.5rem;
+      padding: 1.5rem 2rem;
       text-align: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      box-shadow: 0 6px 12px var(--shadow-dark);
-      letter-spacing: 0.5px;
       position: relative;
+      box-shadow: var(--shadow-md);
+    }
+
+    h1.page-title {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    #company-progress {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      color: #e0e7ff; /* Indigo-100 */
+      background: rgba(255, 255, 255, 0.1);
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      border-radius: 9999px;
+      backdrop-filter: blur(4px);
     }
 
     .nav-buttons {
       position: absolute;
-      right: 1.5rem;
+      left: 2rem;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .nav-button {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.15);
       color: white;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease-in-out;
       text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .nav-button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    #company-progress {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-top: 0.5rem;
-      color: #d1fae5;
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .dashboard-container {
       max-width: 1000px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     .team-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      margin-bottom: 1.5rem;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 8px 16px var(--shadow-light), 0 2px 4px var(--shadow-dark);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .team-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px var(--shadow-light), 0 4px 8px var(--shadow-dark);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      border-color: var(--primary-light);
     }
 
     .team-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f9fafc;
-      padding: 1.2rem 1.5rem;
+      padding: 1.5rem 2rem;
       cursor: pointer;
-      border-bottom: 1px solid var(--border);
+      background: #fff;
       transition: background 0.2s ease;
     }
 
     .team-header:hover {
-      background: #f3f4f7;
+      background: #f8fafc;
+    }
+
+    .team-info {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
     }
 
     .team-name {
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.025em;
     }
 
-    .team-progress {
-      font-size: 1rem;
-      font-weight: 500;
+    .team-progress-badge {
+      font-size: 0.9rem;
+      font-weight: 700;
       color: var(--accent);
-      background: #d1fae5;
-      padding: 0.35rem 0.8rem;
-      border-radius: 8px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease;
+      background: #ecfdf5; /* Emerald-50 */
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      border: 1px solid #a7f3d0; /* Emerald-200 */
+      box-shadow: 0 1px 2px var(--accent-glow);
+    }
+
+    .toggle-icon-wrapper {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .team-card:hover .toggle-icon-wrapper {
+      background: #e0e7ff;
+      color: var(--primary);
     }
 
     .toggle-icon {
-      transition: transform 0.3s ease, color 0.3s ease;
-      color: var(--text-muted);
-      font-size: 1.2rem;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.9rem;
+      font-weight: bold;
     }
 
     .team-card.open .toggle-icon {
       transform: rotate(90deg);
-      color: var(--primary);
+    }
+    
+    .team-card.open .toggle-icon-wrapper {
+       background: var(--primary);
+       color: white;
+    }
+
+    /* Smooth Collapse Animation */
+    .chart-container-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .team-card.open .chart-container-wrapper {
+      grid-template-rows: 1fr;
     }
 
     .chart-area {
-      padding: 1.5rem 2rem 2rem;
-      display: none;
-      background: linear-gradient(180deg, #ffffff 0%, #f9fafc 100%);
+      overflow: hidden;
+      background: #fafafa; /* Slightly off-white for contrast */
+      border-top: 1px solid var(--border);
     }
 
-    .team-card.open .chart-area {
-      display: block;
-      animation: fadeIn 0.4s ease;
+    .chart-content {
+      min-height: 0;
+      padding: 2rem 2.5rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease 0.1s;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .team-card.open .chart-content {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .legend {
       display: flex;
-      gap: 1.5rem;
-      font-size: 1rem;
-      margin-top: 1rem;
+      gap: 2rem;
+      font-size: 0.9rem;
+      margin-top: 1.5rem;
       color: var(--text-muted);
+      justify-content: center; /* Centered legend looks better */
+      padding-top: 1.5rem;
+      border-top: 1px dashed var(--border);
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
       font-weight: 500;
     }
 
     .legend-color {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
 
     footer {
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin: 3rem 0 4rem;
+      margin: 4rem 0;
+      font-weight: 500;
     }
 
+    /* Modern Tooltip */
     .tooltip {
       position: absolute;
-      background: white;
-      border-radius: 12px;
-      padding: 0.6rem 1rem;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      font-size: 0.95rem;
+      background: rgba(15, 23, 42, 0.95); /* Slate-900, highly opaque */
+      color: white;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      max-width: 320px;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+      line-height: 1.5;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(8px);
     }
 
-    svg rect {
-      rx: 6;
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Animation for progress bars on load/reveal */
+    @keyframes growBar {
+      from { width: 0; }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="nav-buttons">
-      <a href="individual-wigs.html" class="nav-button">Individual WIGs →</a>
+      <a href="individual-wigs.html" class="nav-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Go to Individual WIGs
+      </a>
     </div>
-    San3a Tech TWIGs Progress
-    <div id="company-progress">Loading overall progress...</div>
+    <h1 class="page-title">San3a Tech TWIGs Progress</h1>
+    <div id="company-progress">Loading...</div>
   </header>
 
   <div class="dashboard-container" id="dashboard"></div>
-  <footer>Data loaded directly from Team Progress Sheet</footer>
+  <footer>Data live-synced from Team Progress Sheet</footer>
 
   <div class="tooltip" id="tooltip"></div>
 
@@ -245,113 +333,138 @@
         teamData.forEach((d, i) => d.shortLabel = `TWIG #${i + 1}`);
 
         const card = dashboard.append("div").attr("class", "team-card");
+        
         const header = card.append("div").attr("class", "team-header")
-          .on("click", () => card.classed("open", !card.classed("open")));
+          .on("click", function() {
+              const isCurrentlyOpen = card.classed("open");
+              dashboard.selectAll(".team-card.open").classed("open", false);
+              card.classed("open", !isCurrentlyOpen);
+          });
 
-        const leftHeader = header.append("div")
-          .style("display", "flex")
-          .style("gap", "0.8rem")
-          .style("align-items", "center");
+        const info = header.append("div").attr("class", "team-info");
+        info.append("div").attr("class", "team-name").text(teamName);
+        info.append("div").attr("class", "team-progress-badge").text(`${overall}% Completed`);
+        
+        header.append("div").attr("class", "toggle-icon-wrapper")
+              .append("div").attr("class", "toggle-icon").html("▶");
 
-        leftHeader.append("div").attr("class", "team-name").text(teamName);
-        leftHeader.append("div").attr("class", "team-progress").text(`${overall}%`);
-        header.append("div").attr("class", "toggle-icon").html("▶");
+        const chartWrapper = card.append("div").attr("class", "chart-container-wrapper");
+        const chartArea = chartWrapper.append("div").attr("class", "chart-area");
+        const chartContent = chartArea.append("div").attr("class", "chart-content");
 
-        const chartArea = card.append("div").attr("class", "chart-area");
-        const svg = chartArea.append("svg")
-          .attr("viewBox", [0, 0, 850, teamData.length * 55 + 50]);
-        drawTeamChart(svg, teamData);
+        const fullWidth = 900;
+        const fullHeight = teamData.length * 60 + 40; // Slightly taller rows for wider bars
+        
+        const svg = chartContent.append("svg")
+          .attr("viewBox", [0, 0, fullWidth, fullHeight])
+          .attr("preserveAspectRatio", "xMidYMid meet");
+          
+        drawTeamChart(svg, teamData, fullWidth, fullHeight);
 
-        const legend = chartArea.append("div").attr("class", "legend");
+        const legend = chartContent.append("div").attr("class", "legend");
         legend.html(`
-          <div class="legend-item"><div class="legend-color" style="background:var(--primary)"></div> Actual Progress</div>
-          <div class="legend-item"><div class="legend-color" style="background:var(--primary-light)"></div> Remaining to Target</div>
+          <div class="legend-item"><div class="legend-color" style="background:var(--primary)"></div> Achieved Progress</div>
+          <div class="legend-item"><div class="legend-color" style="background:#e2e8f0"></div> Remaining Target</div>
         `);
       });
 
-      // Calculate and display company-wide average
       const companyAverage = Math.round(d3.mean(teamAverages));
-      companyProgressDiv.text(`Company Overall Achievement: ${companyAverage}%`);
+      companyProgressDiv.text(`Company Overall: ${companyAverage}%`);
     }
 
-    function drawTeamChart(svg, data) {
-      const margin = { top: 20, right: 80, bottom: 20, left: 180 };
-      const width = 800 - margin.left - margin.right;
-      const height = data.length * 45;
+    function drawTeamChart(svg, data, fullWidth, fullHeight) {
+      const margin = { top: 30, right: 50, bottom: 10, left: 100 };
+      const width = fullWidth - margin.left - margin.right;
+      const height = fullHeight - margin.top - margin.bottom;
 
       data.forEach(d => {
         d.progress = d.target ? (d.actual / d.target) * 100 : 0;
         d.progress = Math.min(d.progress, 100);
       });
 
-      const x = d3.scaleLinear().domain([0, 100]).range([margin.left, width + margin.left]);
-      const y = d3.scaleBand().domain(data.map(d => d.shortLabel)).range([margin.top, height]).padding(0.25);
+      const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+      const y = d3.scaleBand().domain(data.map(d => d.shortLabel)).range([0, height]).padding(0.4);
 
-      svg.selectAll(".target-bar")
-        .data(data)
-        .join("rect")
-        .attr("x", x(0))
-        .attr("y", d => y(d.shortLabel))
-        .attr("width", x(100) - x(0))
-        .attr("height", y.bandwidth())
-        .attr("fill", "var(--primary-light)");
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-      svg.selectAll(".actual-bar")
-        .data(data)
-        .join("rect")
-        .attr("x", x(0))
-        .attr("y", d => y(d.shortLabel))
-        .attr("width", 0)
+      // Background Track with simpler color
+      g.selectAll(".bg-bar")
+        .data(data).join("rect")
+        .attr("x", 0).attr("y", d => y(d.shortLabel))
+        .attr("width", width).attr("height", y.bandwidth())
+        .attr("fill", "#f1f5f9").attr("rx", y.bandwidth() / 2); // Fully rounded pill shape
+
+      // Target Marker
+      g.selectAll(".target-marker")
+         .data(data).join("line")
+         .attr("x1", x(100)).attr("x2", x(100))
+         .attr("y1", d => y(d.shortLabel) - 4)
+         .attr("y2", d => y(d.shortLabel) + y.bandwidth() + 4)
+         .attr("stroke", "#cbd5e1").attr("stroke-width", 2).attr("stroke-dasharray", "4,4");
+
+      // Foreground Bar with gradient-like solid color
+      g.selectAll(".fg-bar")
+        .data(data).join("rect")
+        .attr("x", 0).attr("y", d => y(d.shortLabel))
         .attr("height", y.bandwidth())
         .attr("fill", "var(--primary)")
-        .on("mousemove", (event, d) => showTooltip(event, `${d.wig}<br><b>${Math.round(d.progress)}%</b> (${d.actual}/${d.target})`))
-        .on("mouseleave", hideTooltip)
-        .transition()
-        .duration(800)
-        .ease(d3.easeCubicOut)
-        .attr("width", d => x(d.progress) - x(0));
+        .attr("rx", y.bandwidth() / 2)
+        .attr("width", 0)
+        // Re-trigger animation when card opens could be complex, so we just rely on initial load for now.
+        // A real app might use IntersectionObserver to trigger this.
+        .transition().duration(1000).ease(d3.easeCubicOut)
+        .attr("width", d => Math.max(y.bandwidth(), x(d.progress))); // Ensure minimum width for visibility
 
-      svg.selectAll(".bar-label")
-        .data(data)
-        .join("text")
-        .attr("x", d => x(d.progress) + 8)
-        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
-        .attr("fill", "var(--text-dark)")
-        .attr("font-size", "14px")
-        .attr("font-weight", "500")
-        .text(d => `${Math.round(d.progress)}%`);
+      // Interaction Layer
+      g.selectAll(".interaction-bar")
+         .data(data).join("rect")
+         .attr("x", -margin.left).attr("y", d => y(d.shortLabel))
+         .attr("width", fullWidth).attr("height", y.bandwidth())
+         .attr("fill", "transparent").style("cursor", "pointer")
+         .on("mousemove", (event, d) => {
+             showTooltip(event, `
+               <div style="font-weight:600;margin-bottom:6px;color:#e0e7ff;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:6px">${d.wig}</div>
+               <div style="display:flex;justify-content:space-between;align-items:center">
+                 <span style="color:var(--accent);font-weight:700;font-size:1.1em">${Math.round(d.progress)}% Done</span>
+                 <span style="color:#94a3b8;font-size:0.9em">(${d.actual} / ${d.target})</span>
+               </div>
+             `);
+         })
+         .on("mouseleave", hideTooltip);
 
-      const yAxis = svg.append("g")
-        .attr("transform", `translate(${margin.left - 10},0)`)
-        .call(d3.axisLeft(y).tickSize(0))
-        .call(g => g.select(".domain").remove());
+      // Percentage Labels placed outside for cleaner look
+      g.selectAll(".label")
+        .data(data).join("text")
+        .attr("x", d => x(d.progress) + 12)
+        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 2 + 5)
+        .text(d => `${Math.round(d.progress)}%`)
+        .attr("font-size", "14px").attr("font-weight", "700")
+        .attr("fill", "var(--text-dark)");
 
-      yAxis.selectAll(".tick text")
-        .attr("font-size", "14px")
-        .on("mousemove", (event, shortLabel) => {
-          const item = data.find(d => d.shortLabel === shortLabel);
-          showTooltip(event, item ? item.wig : shortLabel);
-        })
-        .on("mouseleave", hideTooltip);
+      // Y Axis Labels
+      g.selectAll(".y-label")
+        .data(data).join("text")
+        .attr("x", -15)
+        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 2 + 5)
+        .attr("text-anchor", "end")
+        .text(d => d.shortLabel)
+        .attr("font-size", "14px").attr("font-weight", "600").attr("fill", "var(--text-muted)");
 
-      svg.append("g")
-        .attr("transform", `translate(0,${margin.top})`)
-        .call(d3.axisTop(x).ticks(5).tickFormat(d => d + "%"))
+      // Top X Axis
+      g.append("g").attr("transform", "translate(0,-20)")
+        .call(d3.axisTop(x).ticks(5).tickFormat(d => d + "%").tickSize(0))
         .call(g => g.select(".domain").remove())
-        .selectAll("text")
-        .attr("font-size", "13px");
+        .selectAll("text").attr("font-size", "13px").attr("font-weight", "600").attr("fill", "#94a3b8");
     }
 
     function showTooltip(event, html) {
-      tooltip.html(html)
-        .style("left", (event.pageX + 12) + "px")
-        .style("top", (event.pageY - 28) + "px")
-        .style("opacity", 1)
-        .style("transform", "translateY(-4px)");
+      tooltip.html(html).style("opacity", 1)
+        .style("transform", "translateY(0)")
+        .style("left", (event.pageX + 20) + "px").style("top", (event.pageY - 20) + "px");
     }
 
     function hideTooltip() {
-      tooltip.style("opacity", 0).style("transform", "translateY(0)");
+      tooltip.style("opacity", 0).style("transform", "translateY(10px)");
     }
   </script>
 </body>

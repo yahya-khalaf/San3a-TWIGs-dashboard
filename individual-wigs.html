@@ -3,243 +3,355 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>San3a Tech Individual TWIGs Progress</title>
+  <title>San3a Tech Individual WIGs Progress</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-light: #818cf8;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
       --accent: #10b981;
-      --bg: #f0f4f8;
+      --accent-glow: rgba(16, 185, 129, 0.2);
+      --bg: #f8fafc;
       --card-bg: #ffffff;
-      --text-dark: #111827;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --shadow-light: rgba(0, 0, 0, 0.05);
-      --shadow-dark: rgba(0, 0, 0, 0.12);
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text-dark);
       margin: 0;
     }
 
     header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      background: linear-gradient(145deg, var(--primary-dark), var(--primary));
       color: white;
-      padding: 1.5rem;
+      padding: 1.5rem 2rem;
       text-align: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      box-shadow: 0 6px 12px var(--shadow-dark);
-      letter-spacing: 0.5px;
       position: relative;
+      box-shadow: var(--shadow-md);
+    }
+
+    h1.page-title {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    #company-progress {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      color: #e0e7ff;
+      background: rgba(255, 255, 255, 0.1);
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      border-radius: 9999px;
+      backdrop-filter: blur(4px);
     }
 
     .nav-buttons {
       position: absolute;
-      left: 1.5rem;
+      left: 2rem;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .nav-button {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.15);
       color: white;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease-in-out;
       text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .nav-button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    #company-progress {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-top: 0.5rem;
-      color: #d1fae5;
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .dashboard-container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    /* Team dropdown area */
-    .team-filters {
-      max-width: 1000px;
-      margin: 1.5rem auto 0;
-      padding: 0 1rem;
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
       display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .team-select {
-      background: white;
-      border: 1px solid var(--border);
-      padding: 0.45rem 0.6rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      min-width: 200px;
+      flex-direction: column;
+      gap: 2rem;
     }
 
     .team-section {
-      color: var(--text-dark);
-      margin: 2rem 0 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--primary-light);
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .team-section.open {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+    }
+
+    .team-section-header {
+      padding: 1.5rem 2.5rem;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s ease;
+    }
+
+    .team-section-header:hover {
+      background: #f8fafc;
+    }
+
+    .team-title {
       font-size: 1.5rem;
-      font-weight: 600;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: baseline;
+      gap: 0.8rem;
+    }
+    
+    .member-count {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      background: var(--bg);
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+    }
+
+    .section-toggle-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text-muted);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 1.2rem;
+    }
+    
+    .team-section:hover .section-toggle-icon {
+      color: var(--primary);
+    }
+
+    .team-section.open .section-toggle-icon {
+      transform: rotate(180deg);
+      background: var(--primary);
+      color: white;
+    }
+
+    .team-card-container {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+    }
+
+    .team-section.open .team-card-container {
+      grid-template-rows: 1fr;
+    }
+
+    .team-card-wrapper {
+      overflow: hidden;
+      padding: 0 2rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.4s ease 0.1s;
+    }
+
+    .team-section.open .team-card-wrapper {
+      opacity: 1;
+      transform: translateY(0);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .team-card {
-      background: var(--card-bg);
+      background: #fff;
       border-radius: 16px;
-      margin-bottom: 1.5rem;
       overflow: hidden;
-      box-shadow: 0 8px 16px var(--shadow-light), 0 2px 4px var(--shadow-dark);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
     }
-
+    
     .team-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px var(--shadow-light), 0 4px 8px var(--shadow-dark);
+      border-color: var(--primary-light);
+      transform: translateX(4px);
     }
 
     .team-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f9fafc;
       padding: 1.2rem 1.5rem;
       cursor: pointer;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s ease;
+      background: #fff;
     }
 
     .team-header:hover {
-      background: #f3f4f7;
+      background: #f8fafc;
+    }
+
+    .member-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
     .team-name {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
 
-    .team-progress {
-      font-size: 1rem;
-      font-weight: 500;
+    .team-progress-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
       color: var(--accent);
-      background: #d1fae5;
-      padding: 0.35rem 0.8rem;
+      background: #ecfdf5;
+      padding: 0.25rem 0.6rem;
       border-radius: 8px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease;
+      border: 1px solid #a7f3d0;
     }
 
-    .toggle-icon {
-      transition: transform 0.3s ease, color 0.3s ease;
+    .card-toggle-icon {
       color: var(--text-muted);
-      font-size: 1.2rem;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .team-card.open .toggle-icon {
+    .team-card.open .card-toggle-icon {
       transform: rotate(90deg);
       color: var(--primary);
     }
 
+    .chart-container-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .team-card.open .chart-container-wrapper {
+      grid-template-rows: 1fr;
+    }
+
     .chart-area {
-      padding: 1.5rem 2rem 2rem;
-      display: none;
-      background: linear-gradient(180deg, #ffffff 0%, #f9fafc 100%);
+      overflow: hidden;
+      background: #fafafa;
+      border-top: 1px solid var(--border);
     }
-
-    .team-card.open .chart-area {
-      display: block;
-      animation: fadeIn 0.4s ease;
+    
+    .chart-content {
+        min-height: 0;
+        padding: 1.5rem 2rem;
+        opacity: 0;
+        transition: opacity 0.4s ease 0.2s;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
+    
+    .team-card.open .chart-content {
+        opacity: 1;
     }
 
     .legend {
       display: flex;
       gap: 1.5rem;
-      font-size: 1rem;
-      margin-top: 1rem;
+      font-size: 0.9rem;
+      margin-top: 1.2rem;
       color: var(--text-muted);
+      justify-content: flex-end;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
     }
 
     .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 500;
+       display: flex;
+       align-items: center;
+       gap: 0.5rem;
+       font-weight: 500;
     }
 
     .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
     }
 
     footer {
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin: 3rem 0 4rem;
+      margin: 4rem 0;
     }
 
     .tooltip {
       position: absolute;
-      background: white;
-      border-radius: 12px;
-      padding: 0.6rem 1rem;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      font-size: 0.95rem;
+      background: rgba(15, 23, 42, 0.95);
+      color: white;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      max-width: 400px;
-      white-space: pre-wrap;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      max-width: 320px;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+      line-height: 1.5;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    svg rect {
-      rx: 6;
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
     }
   </style>
 </head>
 <body>
   <header>
     <div class="nav-buttons">
-      <a href="index.html" class="nav-button">← Team WIGs</a>
+      <a href="index.html" class="nav-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Team View
+      </a>
     </div>
-    San3a Tech Individual TWIGs Progress
-    <div id="company-progress">Loading overall progress...</div>
+    <h1 class="page-title">San3a Tech Individual WIGs</h1>
+    <div id="company-progress">Loading...</div>
   </header>
 
-  <!-- Team dropdowns will be inserted here -->
-  <div class="team-filters" id="team-filters" aria-label="Team filters"></div>
-
   <div class="dashboard-container" id="dashboard"></div>
-  <footer>Data loaded directly from Individual Progress Sheet</footer>
+  <footer>Data live-synced from Individual Progress Sheet</footer>
 
   <div class="tooltip" id="tooltip"></div>
 
@@ -248,245 +360,229 @@
     const tooltip = d3.select("#tooltip");
     const companyProgressDiv = d3.select("#company-progress");
 
-    d3.csv(csvUrl).then(rawData => {
-      // Extract team names and member names from the first two rows
-      const teamNames = Object.entries(rawData[0]).reduce((acc, [key, value]) => {
-        if (value && value !== 'WIGs' && key !== '') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {});
+    const orderedTeamNames = ["Admin", "Technical Services", "Education", "Comms", "Programs"];
 
-      const memberNames = rawData[1];
-      const processedData = [];
-      
-      // Compute teams and member counts from the first two rows
-      function computeTeams(raw) {
-        const headerRow = raw[0];
-        const memberRow = raw[1];
-        const cols = Object.keys(memberRow);
-        const teams = [];
+    d3.text(csvUrl).then(textData => {
+        const rows = d3.csvParseRows(textData);
+        if (rows.length < 3) return;
 
-        // find indices where headerRow has a team name (non-empty and not 'WIGs')
-        const headerIndices = [];
-        cols.forEach((col, idx) => {
-          const h = headerRow[col];
-          if (h && h.trim() && h.trim() !== 'WIGs') headerIndices.push({ col, idx, name: h.trim() });
-        });
+        const teamRow = rows[0];
+        const memberRow = rows[1];
+        const colIndexToMemberStr = {};
+        let currentTeam = "";
 
-        // For each header index, count consecutive member cells until next header index
-        for (let i = 0; i < headerIndices.length; i++) {
-          const startIdx = headerIndices[i].idx + 1; // members start after header column
-          const endIdx = (i + 1 < headerIndices.length) ? headerIndices[i + 1].idx - 1 : cols.length - 1;
-          let count = 0;
-          for (let j = startIdx; j <= endIdx; j++) {
-            const colKey = cols[j];
-            if (!colKey) continue;
-            const name = memberRow[colKey];
-            if (name && String(name).trim()) count++;
-          }
-          teams.push({ name: headerIndices[i].name, count });
+        for (let c = 0; c < teamRow.length; c++) {
+            if (teamRow[c] && teamRow[c].trim() !== "" && teamRow[c] !== "WIGs") {
+                currentTeam = teamRow[c].trim();
+            }
+            if (currentTeam && memberRow[c] && memberRow[c].trim() !== "") {
+                colIndexToMemberStr[c] = {
+                    team: currentTeam,
+                    member: memberRow[c].trim(),
+                    colIdx: c
+                };
+            }
         }
 
-        return teams;
-      }
+        const processedData = [];
+        for (let i = 2; i < rows.length; i++) {
+            const row = rows[i];
+            const firstCell = row[0] ? row[0].trim() : "";
 
-      const teamsMeta = computeTeams(rawData);
+            if (firstCell.startsWith("WIG/Initiative") || firstCell === "Personal Growth WIG") {
+                const wigRow = rows[i];
+                const goalRow = rows[i+1];
+                const achievedRow = rows[i+2];
 
-      // Render blank dropdowns for each team showing name and member count
-      const filtersContainer = d3.select('#team-filters');
-      filtersContainer.selectAll('*').remove();
-      teamsMeta.forEach(t => {
-        const select = filtersContainer.append('select')
-          .attr('class', 'team-select')
-          .attr('data-team', t.name);
-        // placeholder option showing team name and count
-        select.append('option').text(`${t.name} — ${t.count} member${t.count === 1 ? '' : 's'}`);
-      });
-      
-      // Process each column (team member)
-      Object.keys(memberNames).forEach(colName => {
-        if (colName === '' || memberNames[colName] === '') return;
-        
-        const memberName = memberNames[colName];
-        const memberWigs = [];
-        
-        // Process each WIG (up to 9) for this member
-        for (let i = 1; i <= 9; i++) {
-          const wigStartRow = (i - 1) * 4 + 2; // WIG description starts at row 2, then every 4 rows
-          const wigData = {
-            name: memberName,
-            teamName: teamNames[colName] || 'Unknown Team',
-            wigNumber: i,
-            description: rawData[wigStartRow][colName],
-            target: parseFloat(rawData[wigStartRow + 1][colName]) || 0,
-            achieved: parseFloat(rawData[wigStartRow + 2][colName]) || 0
-          };
-          
-          // Only include WIGs that have both a description and a target
-          if (wigData.description && wigData.target > 0) {
-            memberWigs.push({
-              team: memberName,
-              teamName: wigData.teamName,
-              wig: wigData.description,
-              target: wigData.target,
-              actual: wigData.achieved,
-              wigNumber: wigData.wigNumber
-            });
-          }
+                if (!wigRow || !goalRow || !achievedRow) continue;
+
+                for (const colIdx in colIndexToMemberStr) {
+                    const memberInfo = colIndexToMemberStr[colIdx];
+                    const wigName = wigRow[colIdx]?.trim();
+
+                    if (wigName && wigName !== "" && wigName !== "-") {
+                        const target = parseFloat(goalRow[colIdx]?.replace(/%|,/g, '')) || 0;
+                        const actual = parseFloat(achievedRow[colIdx]?.replace(/%|,/g, '')) || 0;
+
+                        if (target > 0) {
+                             processedData.push({
+                                team: memberInfo.team,
+                                member: memberInfo.member,
+                                wig: wigName,
+                                target: target,
+                                actual: actual,
+                                id: `wig-${colIdx}-${i}`
+                            });
+                        }
+                    }
+                }
+                 i += 3; 
+            }
         }
-        
-        if (memberWigs.length > 0) {
-          processedData.push(...memberWigs);
-        }
-      });
 
-      drawDashboard(processedData);
+        drawIndividualDashboard(processedData);
     });
 
-    function drawDashboard(data) {
-      // Group data by team name first
-      const teamGroups = d3.groups(data, d => d.teamName);
+    function drawIndividualDashboard(data) {
       const dashboard = d3.select("#dashboard");
+      dashboard.html("");
 
-      const allAverages = [];
+      if (data.length === 0) {
+          dashboard.html("<div style='text-align:center;padding:3rem;color:var(--text-muted)'>No data found in the connected sheet.</div>");
+          return;
+      }
 
-      // Sort teams alphabetically
-      teamGroups.sort((a, b) => a[0].localeCompare(b[0]));
+      const allProgress = data.map(d => Math.min((d.target > 0 ? (d.actual / d.target) * 100 : 0), 100));
+      const companyAverage = Math.round(d3.mean(allProgress) || 0);
+      companyProgressDiv.text(`Company Overall: ${companyAverage}%`);
 
-      teamGroups.forEach(([teamName, teamData]) => {
-        // Create a team section header
-        dashboard.append("h2")
-          .attr("class", "team-section")
-          .text(teamName);
+      const teamsData = d3.groups(data, d => d.team);
+      const teamDataMap = new Map(teamsData);
 
-        // Group team data by individual
-        const individuals = d3.groups(teamData, d => d.team);
-        
-        // Sort individuals alphabetically within each team
-        individuals.sort((a, b) => a[0].localeCompare(b[0]));
+      orderedTeamNames.forEach(teamName => {
+         const membersData = teamDataMap.get(teamName);
+         if (!membersData) return;
 
-        individuals.forEach(([name, individualData]) => {
-          const normalizedProgress = individualData.map(d => {
-            const pct = d.target > 0 ? (d.actual / d.target) * 100 : 0;
-            return Math.min(pct, 100);
-          });
-          const overall = Math.round(d3.mean(normalizedProgress));
-          allAverages.push(overall);
+         const teamSection = dashboard.append("div").attr("class", "team-section");
+         
+         const sectionHeader = teamSection.append("div")
+             .attr("class", "team-section-header")
+             .on("click", () => teamSection.classed("open", !teamSection.classed("open")));
 
-          // Sort WIGs by their number
-          individualData.sort((a, b) => a.wigNumber - b.wigNumber);
-          individualData.forEach(d => d.shortLabel = `WIG #${d.wigNumber}`);
+         const titleDiv = sectionHeader.append("div").attr("class", "team-title");
+         titleDiv.append("span").text(teamName);
+         titleDiv.append("span").attr("class", "member-count").text(`${new Set(membersData.map(d=>d.member)).size} members`);
 
-          const card = dashboard.append("div").attr("class", "team-card");
-          const header = card.append("div").attr("class", "team-header")
-            .on("click", () => card.classed("open", !card.classed("open")));
+         sectionHeader.append("div").attr("class", "section-toggle-icon").html("▼");
 
-          const leftHeader = header.append("div")
-            .style("display", "flex")
-            .style("gap", "0.8rem")
-            .style("align-items", "center");
+         const teamContainer = teamSection.append("div").attr("class", "team-card-container");
+         const teamWrapper = teamContainer.append("div").attr("class", "team-card-wrapper");
 
-          leftHeader.append("div").attr("class", "team-name").text(name);
-          leftHeader.append("div").attr("class", "team-progress").text(`${overall}%`);
-          header.append("div").attr("class", "toggle-icon").html("▶");
+         const members = d3.groups(membersData, d => d.member)
+                           .sort((a, b) => a[0].localeCompare(b[0]));
 
-          const chartArea = card.append("div").attr("class", "chart-area");
-          const svg = chartArea.append("svg")
-            .attr("viewBox", [0, 0, 850, individualData.length * 55 + 50]);
-          drawIndividualChart(svg, individualData);
+         members.forEach(([memberName, memberWigs]) => {
+            const memProgress = memberWigs.map(d => Math.min((d.target > 0 ? (d.actual / d.target) * 100 : 0), 100));
+            const overall = Math.round(d3.mean(memProgress) || 0);
 
-          const legend = chartArea.append("div").attr("class", "legend");
-          legend.html(`
-            <div class="legend-item"><div class="legend-color" style="background:var(--primary)"></div> Actual Progress</div>
-            <div class="legend-item"><div class="legend-color" style="background:var(--primary-light)"></div> Remaining to Target</div>
-          `);
-        });
+            const card = teamWrapper.append("div").attr("class", "team-card");
+            
+            const header = card.append("div").attr("class", "team-header")
+              .on("click", function() {
+                  const isCurrentlyOpen = card.classed("open");
+                  teamWrapper.selectAll(".team-card.open").classed("open", false);
+                  card.classed("open", !isCurrentlyOpen);
+              });
+            
+            const memberInfo = header.append("div").attr("class", "member-info");
+            memberInfo.append("div").attr("class", "team-name").text(memberName);
+            memberInfo.append("div").attr("class", "team-progress-badge").text(`${overall}%`);
+            
+            header.append("div").attr("class", "card-toggle-icon").html("▶");
+
+            const chartWrapper = card.append("div").attr("class", "chart-container-wrapper");
+            const chartArea = chartWrapper.append("div").attr("class", "chart-area");
+            const chartContent = chartArea.append("div").attr("class", "chart-content");
+
+            const fullWidth = 950;
+            const fullHeight = memberWigs.length * 50 + 50; 
+            const svg = chartContent.append("svg")
+                .attr("viewBox", [0, 0, fullWidth, fullHeight])
+                .attr("preserveAspectRatio", "xMidYMid meet");
+            
+            drawMemberChart(svg, memberWigs, fullWidth, fullHeight);
+
+            chartContent.append("div").attr("class", "legend").html(`
+              <div class="legend-item"><div class="legend-color" style="background:var(--primary)"></div> Achieved</div>
+              <div class="legend-item"><div class="legend-color" style="background:#e2e8f0"></div> Target</div>
+            `);
+         });
       });
-
-      // Calculate and display overall average
-      const overallAverage = Math.round(d3.mean(allAverages));
-      companyProgressDiv.text(`Overall Individual Achievement: ${overallAverage}%`);
     }
 
-    function drawIndividualChart(svg, data) {
-      const margin = { top: 20, right: 80, bottom: 20, left: 180 };
-      const width = 800 - margin.left - margin.right;
-      const height = data.length * 45;
+    function drawMemberChart(svg, data, fullWidth, fullHeight) {
+      data.forEach((d, i) => d.shortLabel = `WIG ${i + 1}`);
+      const margin = { top: 30, right: 30, bottom: 10, left: 70 };
+      const width = fullWidth - margin.left - margin.right;
+      const height = fullHeight - margin.top - margin.bottom;
 
       data.forEach(d => {
-        d.progress = d.target ? (d.actual / d.target) * 100 : 0;
-        d.progress = Math.min(d.progress, 100);
+        d.pct = Math.min((d.target > 0 ? (d.actual / d.target) * 100 : 0), 100);
       });
 
-      const x = d3.scaleLinear().domain([0, 100]).range([margin.left, width + margin.left]);
-      const y = d3.scaleBand().domain(data.map(d => d.shortLabel)).range([margin.top, height]).padding(0.25);
+      const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+      const y = d3.scaleBand().domain(data.map(d => d.shortLabel)).range([0, height]).padding(0.4);
 
-      svg.selectAll(".target-bar")
-        .data(data)
-        .join("rect")
-        .attr("x", x(0))
-        .attr("y", d => y(d.shortLabel))
-        .attr("width", x(100) - x(0))
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      // Background Track
+      g.selectAll(".bg-bar")
+        .data(data).join("rect")
+        .attr("x", 0).attr("y", d => y(d.shortLabel))
+        .attr("width", width).attr("height", y.bandwidth())
+        .attr("fill", "#f1f5f9").attr("rx", y.bandwidth() / 2);
+
+      // Target Line
+      g.selectAll(".target-marker")
+        .data(data).join("line")
+        .attr("x1", x(100)).attr("x2", x(100))
+        .attr("y1", d => y(d.shortLabel) - 3)
+        .attr("y2", d => y(d.shortLabel) + y.bandwidth() + 3)
+        .attr("stroke", "#cbd5e1").attr("stroke-width", 2).attr("stroke-dasharray", "3,3");
+
+      // Foreground Bar
+      g.selectAll(".fg-bar")
+        .data(data).join("rect")
+        .attr("x", 0).attr("y", d => y(d.shortLabel))
         .attr("height", y.bandwidth())
-        .attr("fill", "var(--primary-light)");
-
-      svg.selectAll(".actual-bar")
-        .data(data)
-        .join("rect")
-        .attr("x", x(0))
-        .attr("y", d => y(d.shortLabel))
+        .attr("fill", d => d.pct >= 100 ? "var(--accent)" : "var(--primary)")
+        .attr("rx", y.bandwidth() / 2)
         .attr("width", 0)
-        .attr("height", y.bandwidth())
-        .attr("fill", "var(--primary)")
-        .on("mousemove", (event, d) => showTooltip(event, `${d.wig}\n\nTarget: ${d.target}\nAchieved: ${d.actual}\nProgress: ${Math.round(d.progress)}%`))
-        .on("mouseleave", hideTooltip)
-        .transition()
-        .duration(800)
-        .ease(d3.easeCubicOut)
-        .attr("width", d => x(d.progress) - x(0));
+        .transition().duration(800).ease(d3.easeCubicOut)
+        .attr("width", d => Math.max(y.bandwidth(), x(d.pct)));
 
-      svg.selectAll(".bar-label")
-        .data(data)
-        .join("text")
-        .attr("x", d => x(d.progress) + 8)
-        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 1.7)
-        .attr("fill", "var(--text-dark)")
-        .attr("font-size", "14px")
-        .attr("font-weight", "500")
-        .text(d => `${Math.round(d.progress)}%`);
+      // Interaction Layer
+      g.selectAll(".interaction-bar")
+         .data(data).join("rect")
+         .attr("x", -margin.left).attr("y", d => y(d.shortLabel))
+         .attr("width", fullWidth).attr("height", y.bandwidth())
+         .attr("fill", "transparent").style("cursor", "pointer")
+         .on("mousemove", (event, d) => {
+             showTooltip(event, `
+               <div style="font-weight:600;margin-bottom:6px;color:#e0e7ff;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:6px">${d.wig}</div>
+               <div style="display:flex;justify-content:space-between;align-items:center">
+                 <span style="color:${d.pct>=100?'var(--accent)':'var(--primary-light)'};font-weight:700;font-size:1.1em">${Math.round(d.pct)}% Done</span>
+                 <span style="color:#94a3b8;font-size:0.9em">(${d.actual} / ${d.target})</span>
+               </div>
+             `);
+         })
+         .on("mouseleave", hideTooltip);
 
-      const yAxis = svg.append("g")
-        .attr("transform", `translate(${margin.left - 10},0)`)
-        .call(d3.axisLeft(y).tickSize(0))
-        .call(g => g.select(".domain").remove());
+      // Labels
+      g.selectAll(".label")
+        .data(data).join("text")
+        .attr("x", d => x(d.pct) + 10)
+        .attr("y", d => y(d.shortLabel) + y.bandwidth() / 2 + 5)
+        .text(d => `${Math.round(d.pct)}%`)
+        .attr("font-size", "13px").attr("font-weight", "700")
+        .attr("fill", "var(--text-dark)");
 
-      yAxis.selectAll(".tick text")
-        .attr("font-size", "14px")
-        .on("mousemove", (event, shortLabel) => {
-          const item = data.find(d => d.shortLabel === shortLabel);
-          showTooltip(event, item ? item.wig : shortLabel);
-        })
-        .on("mouseleave", hideTooltip);
+      g.append("g").call(d3.axisLeft(y).tickSize(0)).call(g => g.select(".domain").remove())
+        .selectAll("text").attr("font-size", "13px").attr("font-weight", "600").attr("fill", "var(--text-muted)");
 
-      svg.append("g")
-        .attr("transform", `translate(0,${margin.top})`)
-        .call(d3.axisTop(x).ticks(5).tickFormat(d => d + "%"))
+      g.append("g").attr("transform", "translate(0,-15)")
+        .call(d3.axisTop(x).ticks(10).tickFormat(d => d + "%").tickSize(0))
         .call(g => g.select(".domain").remove())
-        .selectAll("text")
-        .attr("font-size", "13px");
+        .selectAll("text").attr("font-size", "12px").attr("font-weight", "600").attr("fill", "#94a3b8");
     }
 
     function showTooltip(event, html) {
-      tooltip.html(html)
-        .style("left", (event.pageX + 12) + "px")
-        .style("top", (event.pageY - 28) + "px")
-        .style("opacity", 1)
-        .style("transform", "translateY(-4px)");
+      tooltip.html(html).style("opacity", 1)
+        .style("transform", "translateY(0)")
+        .style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
     }
-
     function hideTooltip() {
-      tooltip.style("opacity", 0).style("transform", "translateY(0)");
+      tooltip.style("opacity", 0).style("transform", "translateY(10px)");
     }
   </script>
 </body>
