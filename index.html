@@ -39,6 +39,31 @@
       position: relative;
     }
 
+    .nav-buttons {
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .nav-button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .nav-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
     #company-progress {
       font-size: 1.2rem;
       font-weight: 600;
@@ -172,6 +197,9 @@
 </head>
 <body>
   <header>
+    <div class="nav-buttons">
+      <a href="individual-wigs.html" class="nav-button">Individual WIGs →</a>
+    </div>
     San3a Tech TWIGs Progress
     <div id="company-progress">Loading overall progress...</div>
   </header>
